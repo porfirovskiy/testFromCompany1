@@ -3,28 +3,50 @@
 namespace ApiWrapper;
 
 /**
- * Description of URIHandler
+ * Class for operations with URI entities
  *
  * @author porfirovskiy
  */
-class URIHandler 
+class URIHandler implements URIHandlerInterface
 {
     const BOOKS_URI = 'books';
     const AUTHORS_URI = 'authors';
     const AUTHORS_BOOKS_BEGIN_URI = 'authors/';
     const AUTHORS_BOOKS_END_URI = '/books';
     
+    /**
+     * Forming books URI
+     * 
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
     public function getBooksURI(int $limit, int $offset): string
     {
         return static::BOOKS_URI . $this->getURIParams($limit, $offset);
     }
     
+    /**
+     * Forming authors URI
+     * 
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
     public function getAuthorsURI(int $limit, int $offset): string
     {   
         return static::AUTHORS_URI . $this->getURIParams($limit, $offset);
     }
     
-    public function getAuthorsBooksURI(int $authorId, int $limit, int $offset): string
+    /**
+     * Forming author books URI
+     * 
+     * @param int $authorId
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
+    public function getAuthorBooksURI(int $authorId, int $limit, int $offset): string
     {
         return static::AUTHORS_BOOKS_BEGIN_URI 
                 . $authorId 
@@ -32,6 +54,13 @@ class URIHandler
                 . $this->getURIParams($limit, $offset);
     }
     
+    /**
+     * Forming URI string part of params
+     * 
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
     protected function getURIParams(int $limit, int $offset): string
     {
         if ($limit !== 0 && $offset !== 0) {
