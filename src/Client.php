@@ -21,10 +21,11 @@ class Client implements ClientInteface
     
     /**
      * 
+     * 
      * @param GClient $httpClient
-     * @param \ApiWrapper\URIHandler $uriHandler
+     * @param \ApiWrapper\URIHandlerInterface $uriHandler
      */
-    public function __construct(GClient $httpClient, URIHandler $uriHandler)
+    public function __construct(GClient $httpClient, URIHandlerInterface $uriHandler)
     {
         $this->httpClient = $httpClient;
         $this->uriHandler = $uriHandler;
