@@ -68,7 +68,7 @@ class Client implements ClientInteface
      */
     public function getAuthorBooks(int $authorId, int $limit = 0, int $offset = 0): array
     {
-        $authorBooks = $this->makeRequest(static::GET_HTTP_REQUEST_TYPE, $this->uriHandler->getAuthorsBooksURI($authorId, $limit, $offset));
+        $authorBooks = $this->makeRequest(static::GET_HTTP_REQUEST_TYPE, $this->uriHandler->getAuthorBooksURI($authorId, $limit, $offset));
         
         return $authorBooks->data->books;
     }
