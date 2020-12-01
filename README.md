@@ -33,3 +33,9 @@ $result3 = $client->getBooks(4, 2);
 
 var_dump($result);die();
 ```
+
+Run 3 tests:
+
+```sh
+vendor/bin/phpunit tests
+```
