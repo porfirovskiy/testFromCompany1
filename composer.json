@@ -1,0 +1,18 @@
+{
+    "name": "porfirovskiy/api-wrapper",
+    "description": "test wrapper for check",
+    "type": "library",
+    "authors": [
+        {
+            "name": "porfirovskiy",
+            "email": "porfirovskiy@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": { "ApiWrapper\\": "src"}
+    }
+}
