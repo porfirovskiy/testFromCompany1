@@ -8,10 +8,10 @@ namespace ApiWrapper;
  */
 interface ClientInteface {
     
-    public function getBooks(): array;
+    public function getBooks(int $limit = 0, int $offset = 0): array;
     
-    public function getAuthors(): array;
+    public function getAuthors(int $limit = 0, int $offset = 0): array;
     
-    public function getAuthorBooks(int $authorId): array;
+    public function getAuthorBooks(int $authorId, int $limit = 0, int $offset = 0): array;
     
 }

@@ -2,6 +2,9 @@
 
 namespace ApiWrapper;
 
+use ApiWrapper\URIHandler;
+use GuzzleHttp\Client as GClient;
+
 /**
  * Description of Client
  *
@@ -10,83 +13,61 @@ namespace ApiWrapper;
 class Client implements ClientInteface 
 {
     const GET_HTTP_REQUEST_TYPE = 'GET';
-    const BOOKS_URI = 'books';
-    const AUTHORS_URI = 'authors';
-    const AUTHORS_BOOKS_BEGIN_URI = 'authors/';
-    const AUTHORS_BOOKS_END_URI = '/books';
+    const OK_RESPONSE_STATUS = 'OK';
+    const INVALID_REQUEST_RESPONSE_STATUS = 'INVALID_REQUEST';
+    const NOT_FOUND_RESPONSE_STATUS = 'NOT_FOUND';
     
     protected $httpClient;
+    protected $uriHandler;
     
-    public function __construct(\GuzzleHttp\Client $httpClient)
+    public function __construct(GClient $httpClient, URIHandler $uriHandler)
     {
         $this->httpClient = $httpClient;
+        $this->uriHandler = $uriHandler;
     }
     
     public function getBooks(int $limit = 0, int $offset = 0): array
     {
-        $response = $this->httpClient->request(static::GET_HTTP_REQUEST_TYPE, static::BOOKS_URI);
-        $jsonBooks = $response->getBody()->getContents();
-        $books = json_decode($jsonBooks);
+        $books = $this->makeRequest(static::GET_HTTP_REQUEST_TYPE, $this->uriHandler->getBooksURI($limit, $offset));
         
         return $books->data->books;
     }
     
-    public function getAuthors(): array
+    public function getAuthors(int $limit = 0, int $offset = 0): array
     {
-        $response = $this->httpClient->request(static::GET_HTTP_REQUEST_TYPE, static::AUTHORS_URI);
-        $jsonAuthors = $response->getBody()->getContents();
-        $authors = json_decode($jsonAuthors);
+        $authors = $this->makeRequest(static::GET_HTTP_REQUEST_TYPE, $this->uriHandler->getAuthorsURI($limit, $offset));
         
         return $authors->data->authors;
     }
     
-    public function getAuthorBooks(int $authorId): array
+    public function getAuthorBooks(int $authorId, int $limit = 0, int $offset = 0): array
     {
-        $response = $this->httpClient->request(static::GET_HTTP_REQUEST_TYPE, $this->getAuthorsBooksURI($authorId));
-        $jsonAuthorBooks = $response->getBody()->getContents();
-        $authorBooks = json_decode($jsonAuthorBooks);
+        $authorBooks = $this->makeRequest(static::GET_HTTP_REQUEST_TYPE, $this->uriHandler->getAuthorsBooksURI($authorId, $limit, $offset));
         
         return $authorBooks->data->books;
     }
     
-    protected function getAuthorsBooksURI(int $authorId): string
+    protected function makeRequest(string $type, $uri): \stdClass
     {
-        return static::AUTHORS_BOOKS_BEGIN_URI . $authorId . static::AUTHORS_BOOKS_END_URI;
-    }
-    
-    protected function getBooksURI(int $limit, int $offset): string
-    {   
-        static::BOOKS_URI . $this->getURIParams($limit, $offset);
-    }
-    
-    protected function getAuthorsURI(int $limit, int $offset): string
-    {   
-        static::AUTHORS_URI . $this->getURIParams($limit, $offset);
-    }
-    
-    protected function getURIParams(int $limit, int $offset): string
-    {
-        $params = '';
-        
-        if ($limit !== 0 && $offset !== 0) {
-            $data = [
-               'limit' => $limit,
-               'offset' => $offset
-            ];
-            
-        } else if ($limit !== 0 && $offset === 0) {
-            $data = [
-               'limit' => $limit
-            ];
-        } else if ($limit === 0 && $offset !== 0) {
-            $data = [
-               'offset' => $offset
-            ];
-        }
-        
-        $params = http_build_query($data);
-        
-        return '?' . $params;
-    }
+        $response = $this->httpClient->request($type, $uri);
+        $jsonResult = $response->getBody()->getContents();
+        $result = json_decode($jsonResult);
 
+        $this->checkResponseStatus($result);
+
+        return $result;
+    }
+    
+    /**
+     * 
+     * @param string $status
+     * @return void
+     * @throws Exception
+     */
+    protected function checkResponseStatus(\stdClass $response): void
+    {
+        if ($response->status != static::OK_RESPONSE_STATUS) {
+            throw new \Exception('status: ' . $response->status . ', message: '. $response->message);
+        }
+    }
 }
